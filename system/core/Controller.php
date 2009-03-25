@@ -34,6 +34,13 @@ class Controller
 		$this->load_template_data($this->Params['controller'],$this->Params['action']);
 	}
 
+	/**
+	 * Captures all instance variables set within the controller, which are then made available to the views
+	 * Variables beginning with a capital letter are "Global", in that all views have access to them. Lowercase
+	 * variables are only made available to the layout and default view; Partials cannot touch them.
+	 *
+	 * @return void
+	 **/
 	function __set($name,$value)
 	{
 		// Mimic default functionality...
@@ -51,6 +58,11 @@ class Controller
 		}
 	}
 	
+	/**
+	 * Throws an error if the action that we attempted to call was not found
+	 *
+	 * @return void
+	 **/
 	function __call($action,$args)
 	{
 		// Ensure that, at the very least, the view isn't a partial
@@ -71,6 +83,11 @@ class Controller
 		}
 	}
 	
+	/**
+	 * Singleton access for the Controller
+	 *
+	 * @return void
+	 **/
 	static function &Instance()
 	{
 		if (self::$instance === null) {	

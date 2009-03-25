@@ -57,7 +57,7 @@ class Router {
 	 * Singleton access for the Router
 	 *
 	 * @return object
-	 * @author Jonathan Geiger
+	 *
 	 **/
 	static function Instance()
 	{
@@ -72,7 +72,7 @@ class Router {
 	 * Router Constructor. Merges Config and begins processing.
 	 *
 	 * @return void
-	 * @author Jonathan Geiger
+	 *
 	 **/
 	function __construct()
 	{			
@@ -111,7 +111,7 @@ class Router {
 	 * Class for caching in production mode
 	 *
 	 * @return void
-	 * @author Jonathan Geiger
+	 *
 	 **/
 	public function cache()
 	{
@@ -137,7 +137,7 @@ class Router {
 	 * 
 	 * @param $args string 
 	 * @return void
-	 * @author Jonathan Geiger
+	 *
 	 **/
 	private function map($route,$args)
 	{	
@@ -155,7 +155,7 @@ class Router {
 	 *
 	 * @param $key string
 	 * @return string
-	 * @author Jonathan Geiger
+	 *
 	 **/	
 	private function process_wildcard($key)
 	{
@@ -177,7 +177,7 @@ class Router {
 	 * Sets an "is_ajax" key in $this->params if the incoming request is an AJAX request
 	 *
 	 * @return void
-	 * @author Jonathan Geiger
+	 *
 	 **/
 	private function is_ajax()
 	{
@@ -191,7 +191,7 @@ class Router {
 	 * Adds a few useful extra parameters to $this->params
 	 *
 	 * @return void
-	 * @author Jonathan Geiger
+	 *
 	 **/
 	private function populate_params($params)
 	{
@@ -218,7 +218,7 @@ class Router {
 	 *
 	 * @return void
 	 * @throws Error
-	 * @author Jonathan Geiger
+	 *
 	 **/
 	private function validate_route($params)
 	{
@@ -246,7 +246,7 @@ class Router {
 	 * server-defined variables
 	 *
 	 * @return void
-	 * @author Jonathan Geiger
+	 *
 	 **/
 	private function process_uri()
 	{
@@ -304,7 +304,7 @@ class Router {
 	 * is found, it goes through a couple validation and param-population routines.
 	 *
 	 * @return void
-	 * @author Jonathan Geiger
+	 *
 	 **/
 	private function process_routes()
 	{

@@ -26,7 +26,7 @@
 //   Added rule for potato -> potatoes
 //   Added rule for *us -> *uses
 
-// Added by Jonathan Geiger (Nov 24, 2008)
+// Added by Me (Nov 24, 2008)
 //   Cleaned up code to match my preferred style
 //   Added caching
 

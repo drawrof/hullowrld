@@ -10,7 +10,7 @@
 
 /**
  * PHP class for dynamically resizing, cropping, and rotating images for thumbnail purposes and either displaying them on-the-fly or saving them.
- * UPDATED: Dec 14, 2008. Jonathan Geiger. Changed filename and classname for integration into my framework
+ * UPDATED: Dec 14, 2008. JG. Changed filename and classname for integration into my framework
  */
 class ImageLibrary {
     /**

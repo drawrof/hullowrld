@@ -1,0 +1,13 @@
+Options +FollowSymLinks
+RewriteEngine On
+
+# This is for the preferred PATH_INFO method
+# GET strings will be preserved with both options
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule .* index.php/$0 [PT,L,QSA]
+
+# This is for the GET method
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)?(.*)$ index.php?$1&$2 [L,QSA]

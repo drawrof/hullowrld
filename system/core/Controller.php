@@ -86,7 +86,7 @@ class Controller
 	/**
 	 * Singleton access for the Controller
 	 *
-	 * @return void
+	 * @return Object
 	 **/
 	static function &Instance()
 	{
@@ -98,11 +98,30 @@ class Controller
 		return self::$instance;
 	}
 	
+	/**
+	 * If 'template.php' exists in the config directory. It is loaded.
+	 * It is expected to contain an array of template data for views, which is
+	 * useful for things like page titles and descriptions that don't really make sense
+	 * to be set in either the view or the controller.
+	 * 
+	 * This searches for three keys, first '_default' which contains "default" template data.
+	 * Then, it searches for a key in the format of 'controller/action', and finally for a key
+	 * that matches exactly the incoming URI, i.e. 'home/index'.
+	 * 
+	 * Then, every key in these arrays are made available to the views via the magic of the __set method.
+	 * They are simply looped through and added to the controller.
+	 * 
+	 * Check the config/template.php for a sample.
+	 *
+	 * @return void
+	 **/
 	private function load_template_data($controller,$action)
 	{
+		// Load the template if it exists
 		$config = Config::Instance()->template;
 		if (empty($config)) return;
 		
+		// Set the array key to be searched
 		$controller = str_replace('_controller','',$controller);
 		$route = $controller.'/'.$action;
 		
@@ -118,6 +137,12 @@ class Controller
 		}
 	}
 	
+	/**
+	 * Ensures that the action that is about to be called responds to the format
+	 * that the Router determined was requested.
+	 *
+	 * @return void
+	 **/
 	private function responds_to($action,$format)
 	{
 		$unknown = false;
@@ -143,6 +168,11 @@ class Controller
 		}
 	}
 	
+	/**
+	 * Ensures that a particular action is public
+	 *
+	 * @return void
+	 **/
 	function is_public($action)
 	{
 		try {
@@ -160,10 +190,15 @@ class Controller
 			// Exception will be caught when the method doesn't exist at all.
 			// Just return false and __call will pick up the missing action to generate
 			// the proper error.
-			return false;
+			return;
 		}
 	}
 	
+	/**
+	 * Renders the default view for the action
+	 *
+	 * @return Object
+	 **/
 	public function render()
 	{
 		if (!empty($this->layout)) {
@@ -173,6 +208,11 @@ class Controller
 		}
 	}
 	
+	/**
+	 * Indicates the Router that the route was successful and it should be cached.
+	 *
+	 * @return void
+	 **/
 	public function destroy()
 	{
 		Router::Instance()->cache();

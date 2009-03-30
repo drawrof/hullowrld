@@ -55,6 +55,16 @@
 				top: -0.05em;
 			} 
 			
+			h3
+			{
+				color:#999999;
+				font-family:Arial,Helvetica;
+				font-size:0.6em;
+				margin-top:1em;
+				text-transform:uppercase;
+				margin-bottom:-1em;
+			}
+			
 			.content
 			{
 				padding: 1em 2.5em;
@@ -83,8 +93,9 @@
 			
 			.memory
 			{
-				color: #666666;
-				font-size: 0.8em
+				color:#999;
+				font-family:Arial;
+				font-size:0.6em;
 			}
 			
 			#trace
@@ -162,6 +173,16 @@
 				color: #C79810 !important;
 			}
 			
+			p
+			{
+				line-height:1.8em;
+				margin-bottom:1.5em;
+			}
+			
+			#profile
+			{
+				padding: 0.5em 1.5em 0.5em 2.7em
+			}
 			
 		</style>
 	</head>

@@ -3,6 +3,9 @@
 // Comment this line to default to your server's error reporting level
 error_reporting(E_ALL);
 
+// Starting point in time
+define('APP_START',microtime(true));
+
 // development: Verbose errors, Disabled Caching
 // production: Safe errors, Enabled Caching
 define('APP_ENV','development');

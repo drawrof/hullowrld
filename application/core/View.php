@@ -45,7 +45,7 @@ class View
 		$this->data = array_merge((array)Controller::$data['global'],(array)$data);
 	}
 	
-	public function render()
+	private function render()
 	{				
 		if (file_exists($this->path) && !empty(self::$content_type[$this->format])) {
 			// Extract the data. A manual extract, using foreach,
@@ -69,78 +69,83 @@ class View
 			throw new Error('missing_view', array('view_path' => $this->path));
 		}
 	}
-}
+	
+	static function render($file = null,$data = array())
+	{
+		// If the file is null, we'll assume it's a call for the
+		// default view to be rendered
+		if ($file == null) {
+			$file = Router::Instance()->params['action'];
+			$data = Controller::$data['local'];
+		}
 
-function render($file = null,$data = array())
-{
-	// If the file is null, we'll assume it's a call for the
-	// default view to be rendered
-	if ($file == null) {
-		$file = Router::Instance()->params['action'];
-		$data = Controller::$data['local'];
+		// Instantiate the view
+		$view = new View($file,$data,false);
+
+		// Render it immediately
+		return $view->render();
 	}
 	
-	// Instantiate the view
-	$view = new View($file,$data,false);
-	
-	// Render it immediately
-	return $view->render();
-}
+	static function partial($file = null,$data = array())
+	{		
+		// Add an underscore to the partial name if necessary
+		$filename = basename($file);
+		$directory = dirname($file);
 
-function render_partial($file = null,$data = array())
-{		
-	// Add an underscore to the partial name if necessary
-	$filename = basename($file);
-	$directory = dirname($file);
-	
-	// Get rid of dirname's '.' return value when there is no dirname
-	$directory = ($directory == '.') ? '' : $directory.'/';
-		
-	// Add an underscore if it's necessary	
-	if ($file != null && substr($filename,0,1) != '_') {
-		$filename = '_'.$filename;
-	} 
-	
-	// Add the full path back together
-	$file = $directory.$filename;
-	
-	// Instantiate the view
-	$view = new View($file,$data,true);
-	
-	// Render it immediately
-	return $view->render();
-}
+		// Get rid of dirname's '.' return value when there is no dirname
+		$directory = ($directory == '.') ? '' : $directory.'/';
 
-function render_collection($file = null,$data = array())
-{
-	// Determine the variable name that is passed to the partial
-	$data_name = basename($file);
-	$data_name = ltrim($data_name,'_');
-	
-	// Counter to be passed to the collection
-	$i = 0;
-	
-	// Final rendered content
-	$collection = '';
-	
-	// Loop through each item in the array, rendering a partial and 
-	// passing some data to the file
-	foreach ($data as $key => $value) {
-		
+		// Add an underscore if it's necessary	
+		if ($file != null && substr($filename,0,1) != '_') {
+			$filename = '_'.$filename;
+		} 
+
+		// Add the full path back together
+		$file = $directory.$filename;
+
+		// Instantiate the view
+		$view = new View($file,$data,true);
+
+		// Render it immediately
+		return $view->render();
+	}
+
+	static function render_collection($file = null,$data = array())
+	{
+		// Determine the variable name that is passed to the partial
+		$data_name = basename($file);
+		$data_name = ltrim($data_name,'_');
+
+		// Counter to be passed to the collection
+		$i = 0;
+
+		// A few array keys
 		$data_key = $data_name.'_key';
 		$data_counter = $data_name.'_counter';
-		
-		// Data to be passed
-		$partial_data = array(
-			$data_name 		=> $value,
-			$data_key 		=> $key,
-			$data_counter	=> $i,
-		);
-		
-		$collection .= render_partial($file,$partial_data)."\n";
+
+		// Final rendered content
+		$collection = '';
+
+		// Loop through each item in the array, rendering a partial and 
+		// passing some data to the file
+		foreach ($data as $key => $value) {
+
+			// Data to be passed
+			$partial_data = array(
+				$data_name 		=> $value,
+				$data_key 		=> $key,
+				$data_counter	=> $i,
+			);
+
+			// Render it
+			$collection .= render_partial($file,$partial_data)."\n";
+
+			// Increment the counter
+			$i++;
+		}
+
+		return $collection;
 	}
-	
-	return $collection;
 }
 
 ?>

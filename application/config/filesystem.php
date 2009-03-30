@@ -6,20 +6,17 @@ define('ROOT',realpath(dirname(__FILE__)));
 // Document Root, useful for outputting URLs
 define('DOCROOT',rtrim(str_replace(realpath($_SERVER['DOCUMENT_ROOT']),'',realpath(ROOT)),'/'));
 
-// Super Root, should contain everything
-define('SUPER_ROOT', dirname(ROOT));
-
 // Core Directory
-define('CORE_DIR',SYSTEM_DIR.'/core');
+define('CORE_DIR',APP_DIR.'/core');
 
 // Houses various libraries
-define('LIB_DIR',SYSTEM_DIR.'/libraries');
+define('LIB_DIR',APP_DIR.'/libraries');
 
 // Houses various helpers for application development
-define('HELPER_DIR',SYSTEM_DIR.'/helpers');
+define('HELPER_DIR',APP_DIR.'/helpers');
 
 // Houses various drivers for libraries
-define('DRIVER_DIR',SYSTEM_DIR.'/drivers');
+define('DRIVER_DIR',LIB_DIR.'/drivers');
 
 // Location of application controllers
 define('CONTROLLER_DIR',APP_DIR.'/controllers');

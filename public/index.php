@@ -7,11 +7,10 @@ error_reporting(E_ALL);
 // production: Safe errors, Enabled Caching
 define('APP_ENV','development');
 
-// Simple way to locate the application and system directories
-// If you want a non-standard directory structure, use the constants below
+// Simple way to locate the application directory
+// If you want a non-standard directory structure, use the constants in config/filesystem.php
 // Set a string inside the realpath function to the appropriate directory
 // relative to this document. Absolute paths are acceptable as well.
-define('SYSTEM_DIR',realpath('../system'));
 define('APP_DIR',realpath('../application'));
 
 // -----------------------------------------------------

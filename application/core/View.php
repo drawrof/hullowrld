@@ -90,23 +90,57 @@ function render($file = null,$data = array())
 function render_partial($file = null,$data = array())
 {		
 	// Add an underscore to the partial name if necessary
-	$pos = strrpos($file,'/');
-
-	if ($pos !== FALSE) {
-		if ($file[($pos+1)] !== '_') {
-			$file = substr_replace($file,'/_',$pos,1);
-		}
-	} else {
-		if ($file[0] !== '_') {
-			$file = '_'.$file;
-		}	
-	}
+	$filename = basename($file);
+	$directory = dirname($file);
+	
+	// Get rid of dirname's '.' return value when there is no dirname
+	$directory = ($directory == '.') ? '' : $directory.'/';
+		
+	// Add an underscore if it's necessary	
+	if ($file != null && substr($filename,0,1) != '_') {
+		$filename = '_'.$filename;
+	} 
+	
+	// Add the full path back together
+	$file = $directory.$filename;
 	
 	// Instantiate the view
 	$view = new View($file,$data,true);
 	
 	// Render it immediately
 	return $view->render();
+}
+
+function render_collection($file = null,$data = array())
+{
+	// Determine the variable name that is passed to the partial
+	$data_name = basename($file);
+	$data_name = ltrim($data_name,'_');
+	
+	// Counter to be passed to the collection
+	$i = 0;
+	
+	// Final rendered content
+	$collection = '';
+	
+	// Loop through each item in the array, rendering a partial and 
+	// passing some data to the file
+	foreach ($data as $key => $value) {
+		
+		$data_key = $data_name.'_key';
+		$data_counter = $data_name.'_counter';
+		
+		// Data to be passed
+		$partial_data = array(
+			$data_name 		=> $value,
+			$data_key 		=> $key,
+			$data_counter	=> $i,
+		);
+		
+		$collection .= render_partial($file,$partial_data)."\n";
+	}
+	
+	return $collection;
 }
 
 ?>

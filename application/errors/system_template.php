@@ -2,7 +2,7 @@
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
-		<title>pikonik - a very nice MVC framework</title>
+		<title>Oh No! An error occurred!</title>
 		<style type='text/css'>
 		
 			body {

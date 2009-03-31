@@ -203,15 +203,25 @@ class Controller
 	/**
 	 * Renders the default view for the action
 	 *
-	 * @return Object
+	 * @return string
 	 **/
 	public function render()
 	{
+		// Load a layout if one is set by the controller
 		if (!empty($this->layout)) {
-			return render('/layouts/'.$this->layout,self::$data['local']);
+			$file = '/layouts/'.$this->layout;
+			
+		// Otherwise load a view based on the name of action
 		} else {
-			return render($this->Params['action'],self::$data['local']);
+			$file = $this->Params['action'];
 		}
+		
+		// Set the data
+		$data = self::$data['local'];
+		
+		// Instantiate the View, bypassing the higher-level 
+		// static rendering methods like View::render();
+		return new View($file,$data);
 	}
 	
 	/**

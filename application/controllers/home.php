@@ -7,6 +7,7 @@ class HomeController extends ApplicationController {
 	public function index() 
 	{
 		$this->memory_used = round(memory_get_peak_usage()/1024/1024,2);
+		$this->backtrace = debug_backtrace();		
 		
 		// Models
 		// _________________________

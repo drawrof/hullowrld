@@ -189,6 +189,6 @@
 	<body>
 		<div class='container'>
 			<h1><span class='icon'>*</span> hellowrld</h1>
-			<?=render()?>
+			<?=view::render()?>
 	</body>
 </html>

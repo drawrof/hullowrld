@@ -26,6 +26,10 @@ class App {
 		$action = $params['action'];
 		$controller =& Controller::Instance();
 		$controller->$action($params);
+		
+		// Grab the output from the controller
+		// Returns a View Object, but the magic __toString()
+		// takes care of it.
 		self::$output = $controller->render();
 		
 		// Send it to the browser

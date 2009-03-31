@@ -36,7 +36,7 @@ class Controller
 		$this->$model = Model::Factory($this->Params['Model'],$this->Params['id'],true);
 		
 		// Load template data
-		$this->load_template_data($this->Params['controller'],$this->Params['action']);
+		$this->load_view_data($this->Params['controller'],$this->Params['action']);
 	}
 
 	/**
@@ -104,7 +104,7 @@ class Controller
 	}
 	
 	/**
-	 * If 'template.php' exists in the config directory. It is loaded.
+	 * If 'view_data.php' exists in the config directory. It is loaded.
 	 * It is expected to contain an array of template data for views, which is
 	 * useful for things like page titles and descriptions that don't really make sense
 	 * to be set in either the view or the controller.
@@ -121,14 +121,13 @@ class Controller
 	 *
 	 * @return void
 	 **/
-	private function load_template_data($controller,$action)
+	private function load_view_data($controller,$action)
 	{
 		// Load the template if it exists
-		$config = Config::Instance()->template;
+		$config = Config::Instance()->view_data;
 		if (empty($config)) return;
 		
 		// Set the array key to be searched
-		$controller = str_replace('_controller','',$controller);
 		$route = $controller.'/'.$action;
 		
 		// Loop through each possible key

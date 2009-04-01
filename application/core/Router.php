@@ -33,7 +33,8 @@ class Router {
 		
 		// parameters that must exist
 		'validate' => array(
-			'controller'
+			'controller',
+			'action'
 		)
 	);
 	
@@ -88,14 +89,8 @@ class Router {
 		
 		// ...and map them if they're not coming from the cache
 		if (!$config->is_cached) {
-			
-			// Reset the routes
-			self::$routes = null;
-			
-			// Loop through each and map them
-			foreach($config->routes as $route => $args) {
-				$this->map($route,$args);
-			}
+						
+			array_walk(self::$routes,array($this,'map'));
 			
 			// Flag the cache
 			$this->cache_routes = true;
@@ -139,7 +134,7 @@ class Router {
 	 * @return void
 	 *
 	 **/
-	private function map($route,$args)
+	private function map($args,$route)
 	{	
 		self::$routes[(string)$route] = $args;
 		
@@ -196,14 +191,14 @@ class Router {
 	private function populate_params($params)
 	{
 		$extra = array(
-			'Controller' => App::beautify($this->params['controller']."Controller"),
-			'controller' => App::uglify($this->params['controller']),
+			'Controller' => inflector::beautify($this->params['controller']."Controller"),
+			'controller' => inflector::uglify($this->params['controller']),
 			
-			'Model' => App::beautify($this->params['controller'],'singularize'),
-			'model' => App::uglify($this->params['controller'],'singularize'),
-			
-			'Action' => App::beautify($this->params['action']),
-			'action' => App::uglify($this->params['action']),
+			'Model' => inflector::beautify($this->params['controller'],'singularize'),
+			'model' => inflector::uglify($this->params['controller'],'singularize'),
+
+			'Action' => inflector::beautify($this->params['action']),
+			'action' => inflector::uglify($this->params['action']),
 			
 			'URI' => $this->original,
 			'Route' => $this->string,
@@ -239,6 +234,19 @@ class Router {
 				);	
 			}
 		}
+		
+		// Although the controller prevents private actions from being called,
+		// the constructor must be public. The best way to get around this
+		// is to not allow actions starting with underscores to be recognized.
+		if (substr($params['action'],0,1) === '_') {
+			throw new Error(
+				'action_with_leading_underscore',
+				array(
+					'action' => $params['action']
+				)
+			);
+		}
+		
 	}
 	
 	/**

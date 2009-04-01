@@ -185,4 +185,71 @@ class inflector {
         else
             return $count.' '.self::pluralize($string);
     }
+
+	/**
+	 * Converts an "ugly" string to a pretty one. 
+	 * e.g. "home_controller" is converted to "HomeController"
+	 * Optionally inflectifies it if passed a string for the second arg.
+	 * 
+	 * @param string
+	 * @param string $option 
+	 *
+	 * @return string
+	 **/
+	static function beautify($string,$option = false)
+	{
+		// Convert dashes and underscores to spaces
+		$string = str_replace('_',' ',$string);
+		$string = str_replace('-',' ',$string);
+		
+		// Inflectify
+		if ($option === 'singularize') {
+			$string = inflector::singularize($string);
+		} else if ($option === 'pluralize') {
+			$string = inflector::pluralize($string);
+		}
+		
+		// Uppercase and remove spaces
+		if ($option === true) {
+			$string = ucwords($string);
+		} else {
+			$string = str_replace(' ','',ucwords($string));
+		}
+
+		return $string;
+	}
+
+	/**
+	 * Converts a pretty string to an ugly one. 
+	 * e.g. "HomeController" is converted to "home_controller"
+	 * Optionally inflectifies it if passed a string for the second arg.
+	 * 
+	 * @param string
+	 * @param string $option 
+	 *
+	 * @return string
+	 **/
+	static function uglify($string,$inflector = false)
+	{
+		// This Regex splits apart a string at each capital letter
+		$string =  preg_replace('/(\B[A-Z])(?=[a-z])|(?<=[a-z])([A-Z])/sm', ' $1$2', $string);
+		
+		// Convert dashes to spaces
+		$string = str_replace('-',' ',$string);
+		
+		// Inflectify
+		if ($inflector === 'singularize') {
+			$string = inflector::singularize($string);
+		} else if ($inflector === 'pluralize') {
+			$string = inflector::pluralize($string);
+		}
+		
+		// Lowercase it and convert spaces to underscores
+		$string =  strtolower(str_replace(' ','_',$string));
+		$string = preg_replace('(_{2,})','_',$string);
+		$string = trim($string,'_');
+		
+		// Finally, remove duplicate adjacent underscores
+		return $string;
+	}
 }

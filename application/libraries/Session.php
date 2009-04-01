@@ -43,7 +43,7 @@ class SessionLibrary {
 		$_SESSION['_session_id'] = session_id();
 		
 		// Set the full driver class name
-		$driver = "Session_".App::beautify(self::$config['driver'])."_Driver";
+		$driver = "Session_".inflector::beautify(self::$config['driver'])."_Driver";
 	
 		// Load the driver
 		self::$Driver = new $driver(self::$config);

@@ -20,7 +20,7 @@ class Model
 		$this->Db = DatabaseLibrary::Instance($this->Db);
 		
 		// Set the first table
-		$this->Db->from(App::uglify(get_class($this),'pluralize'));
+		$this->Db->from(inflector::uglify(get_class($this),'pluralize'));
 	}
 	
 	/**
@@ -39,7 +39,7 @@ class Model
 		if ($check_existence) {
 			
 			// Check to see if it exists, and return if it doesn't
-			$path = App::check_path(App::uglify($name),MODEL_DIR);
+			$path = App::check_path(inflector::uglify($name),MODEL_DIR);
 			if (!file_exists($path)) {
 				return false;
 			}

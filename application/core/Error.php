@@ -9,6 +9,7 @@ class Error extends Exception {
 		'missing_action' => array('The action "{action}" in the controller "{controller}" does not exist. If this particular page doesn&rsquo;t require an action, create a view in "{view_path}" and the system will automatically render it.', 404),
 		'private_action' => array('The action "{action}" in the controller "{controller}" is private and cannot be called.', 404),
 		'invalid_format' => array('"{controller}->{action}()" is not configured to respond to "{format}" requests.', 404),
+		'action_with_leading_underscore' => array('The router determined that the incoming route&rsquo;s "action" parameter&mdash;"{action}"&mdash;began with an underscore. Actions cannot begin with an underscore.', 404),
 		
 		// Views
 		'missing_view' => array('The view "{view_path}" does not exist.', 500),

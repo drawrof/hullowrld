@@ -46,7 +46,7 @@ class Controller
 	 *
 	 * @return void
 	 **/
-	public function __set($name,$value)
+	private function __set($name,$value)
 	{
 		// Mimic default functionality...
 		$this->$name = $value;
@@ -68,7 +68,7 @@ class Controller
 	 *
 	 * @return void
 	 **/
-	public function __call($action,$args)
+	private function __call($action,$args)
 	{
 		// Ensure that, at the very least, the view isn't a partial
 		$action = ltrim($action,'_');
@@ -88,19 +88,29 @@ class Controller
 		}
 	}
 	
+	
 	/**
-	 * Singleton access for the Controller
+	 * Renders the default view for the action
 	 *
-	 * @return Object
+	 * @return string
 	 **/
-	static public function &Instance()
-	{
-		if (self::$instance === null) {	
-			// Instantiate the Controller
-			$controller = Router::Instance()->params['Controller'];
-			new $controller;
+	private function __toString()
+	{		
+		// Load a layout if one is set by the controller
+		if (!empty($this->layout)) {
+			$file = '/layouts/'.$this->layout;
+			
+		// Otherwise load a view based on the name of action
+		} else {
+			$file = $this->Params['action'];
 		}
-		return self::$instance;
+		
+		// Set the data
+		$data = self::$data['local'];
+				
+		// Let __toString() do its magic
+		$view = new View($file,$data);
+		return (string)$view;
 	}
 	
 	/**
@@ -117,7 +127,7 @@ class Controller
 	 * They are simply looped through and added to the controller. Uppercase keys are global, lowercase are
 	 * only available to the main layout and the view.
 	 * 
-	 * Check the config/template.php for a sample.
+	 * Check the config/view_data.php for a sample.
 	 *
 	 * @return void
 	 **/
@@ -178,7 +188,7 @@ class Controller
 	 *
 	 * @return void
 	 **/
-	function is_public($action)
+	private function is_public($action)
 	{
 		try {
 			$reflection = new ReflectionMethod($this,$action);
@@ -197,40 +207,6 @@ class Controller
 			// the proper error.
 			return;
 		}
-	}
-	
-	/**
-	 * Renders the default view for the action
-	 *
-	 * @return string
-	 **/
-	public function render()
-	{
-		// Load a layout if one is set by the controller
-		if (!empty($this->layout)) {
-			$file = '/layouts/'.$this->layout;
-			
-		// Otherwise load a view based on the name of action
-		} else {
-			$file = $this->Params['action'];
-		}
-		
-		// Set the data
-		$data = self::$data['local'];
-		
-		// Instantiate the View, bypassing the higher-level 
-		// static rendering methods like View::render();
-		return new View($file,$data);
-	}
-	
-	/**
-	 * Indicates the Router that the route was successful and it should be cached.
-	 *
-	 * @return void
-	 **/
-	public function destroy()
-	{
-		Router::Instance()->cache();
 	}
 }
 

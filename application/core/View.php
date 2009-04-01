@@ -146,7 +146,7 @@ class View
 	{
 		// If the file is null, we'll assume it's a call for the
 		// default view to be rendered
-		if ($file == null) {
+		if ($file === null) {
 			$file = Router::Instance()->params['action'];
 			$data = Controller::$data['local'];
 		}
@@ -170,26 +170,11 @@ class View
 	 **/
 	static function render_partial($file = null,$data = array())
 	{		
-		// Add an underscore to the partial name if necessary
-		$filename = basename($file);
-		$directory = dirname($file);
-
-		// Get rid of dirname's '.' return value when there is no dirname
-		$directory = ($directory == '.') ? '' : $directory.'/';
-
-		// Add an underscore if it's necessary	
-		if ($file != null && substr($filename,0,1) != '_') {
-			$filename = '_'.$filename;
-		} 
-
-		// Add the full path back together
-		$file = $directory.$filename;
-
-		// Instantiate the view
-		$view = new View($file,$data);
+		// Instantiate the Partial
+		$partial = new Partial($file,$data);
 
 		// Render it immediately
-		return $view->process();
+		return $partial->process();
 	}
 	
 	/**
@@ -220,7 +205,7 @@ class View
 	{
 		// Determine the variable name that is passed to the partial
 		$data_name = basename($file);
-		$data_name = App::uglify(ltrim($data_name,'_'),'singularize');
+		$data_name = inflector::uglify(ltrim($data_name,'_'),'singularize');
 
 		// Counter to be passed to the collection
 		$i = 0;
@@ -251,13 +236,43 @@ class View
 			);
 
 			// Render it
-			$collection .= self::render_partial($file,$partial_data)."\n";
+			$partial = new Partial($file,$partial_data);
+			$collection .= $partial->process()."\n";
 
 			// Increment the counter
-			$i++;
+			++$i;
 		}
 
 		return $collection;
+	}
+}
+
+class Partial extends View
+{
+	/**
+	 * Sets up a partial to be processed and rendered.
+	 * 
+	 * @param string
+	 * @param array
+	 *
+	 **/
+	function __construct($file = null,$data = array())
+	{														
+		// Ensure there is an underscore in the filename
+		$filename = basename($file);
+		
+		if ($file != null && substr($filename,0,1) !== '_') {
+			
+			$filename = '_'.$filename;
+			$directory = dirname($file);
+
+			// Get rid of dirname's '.' return value when there is no dirname
+			$directory = ($directory == '.') ? '' : $directory.'/';
+			
+			$file = $directory.$filename;
+		}
+		
+		parent::__construct($file,$data);
 	}
 }
 

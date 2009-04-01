@@ -197,7 +197,7 @@ class DatabaseLibrary {
 			$this->config['connection'] = $db;
 		}
 		// Set driver name
-		$driver = 'Database_'.App::beautify($this->config['connection']['type']).'_Driver';
+		$driver = 'Database_'.inflector::beautify($this->config['connection']['type']).'_Driver';
 
 		// Initialize the driver
 		$this->driver = new $driver($this->config);

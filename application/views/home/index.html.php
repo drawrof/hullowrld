@@ -7,13 +7,13 @@
 	
 	<h3>Passing Data to the View</h3>
 	<p>
-		Data is passed to the view by simply adding an instance variable to the controller. For example, the action that controls this page defines an instance variable <span class='code'><span class='class'>$this</span><span class='type'>-></span><span class='method'>memory_used</span></span>. This variable is then available to the view via the variable <span class='method'>$memory_used</span>. If you would like a variable available to all views, layouts, partials, and collections make the first letter of the variable uppercase.
+		Data is passed to the view by simply adding an instance variable to the controller. For example, the action that controls this page defines an instance variable <span class='code'><span class='class'>$this</span><span class='type'>-></span><span class='class'>content</span><span class='type'>-></span><span class='method'>memory_used</span></span>. This variable is then available to the view via the variable <span class='method'>$memory_used</span>. If you would like a variable available to all views, layouts, partials, and collections make the first letter of the variable uppercase.
 	</p>
 	
 	<h3>Layouts</h3>
 	<p>
-		This page is wrapped in a special layout view in located in &#8220;<span class='code'>/views/layouts/home.html.php</span>&#8221;. A call to 
-		&#8220;<span class='code'><span class='class'>view</span><span class='type'>::</span><span class='method'>render</span>()</span>&#8221; within that layout specifies where you would like your page specific view to go. Setting the instance variable <span class='code'><span class='class'>$this</span><span class='type'>-></span><span class='method'>layout</span></span> equal to the name of the layout file in your controller lets the system know that you'd like the page rendered with a layout.
+		This page is wrapped in a special layout view in located in &#8220;<span class='code'>/views/layouts/home.html.php</span>&#8221;. Echoing 
+		&#8220;<span class='code'><span class='method'>$content</span></span>&#8221;, which is a special variable made available to the layout, specifies where you would like your page specific view to go. Setting the instance variable <span class='code'><span class='class'>$this</span><span class='type'>-></span><span class='method'>layout</span></span> equal to the name of the layout file in your controller lets the system know that you'd like the page rendered with a layout.
 	</p>
 	
 	<h3>Partials</h3>

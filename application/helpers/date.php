@@ -26,6 +26,7 @@ class date
 		// Could it already be a timestamp?
 		if (is_numeric($date)) {
 			switch (strtolower($format)) {
+				case 'mysql':
 				case "datetime":
 				case 'timestamp':
 					return date("Y-m-d H:i:s", $date);
@@ -42,7 +43,7 @@ class date
 				case "date":
 					return date("Y-m-d", $date);
 					break;
-					
+				
 				case 'unix':
 					return $date;
 				

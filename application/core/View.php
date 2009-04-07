@@ -3,7 +3,7 @@
 class View 
 {	
 	// Headers for particular extensions
-	static $content_type = array(
+	static $content_types = array(
 		'html'	=> 	'text/html',
 		'js'	=> 	'application/javascript',
 		'css'	=> 	'text/css',
@@ -15,20 +15,23 @@ class View
 		'gif'	=> 	'image/gif'
 	);
 	
+	// Format all views will be rendered as
+	static public $format = null;
+	
+	// Global data from the controller
+	static $global_data = array();
+	
 	// Data for each instance
-	private $data = array();
+	public $data = array();
 	
-	// File to be rendered
-	private $file;
+	// Filename
+	public $file;
 	
-	// Location of the file
-	private $path;
-	
-	// File type
-	private $format;
+	// Final path to be rendered
+	public $path = null;
 	
 	// Final Rendered View
-	private $view = null;
+	public $view = null;
 
 	/**
 	 * Sets up a view to be processed and rendered. Gathers full path information
@@ -50,10 +53,9 @@ class View
 			$file = Router::Instance()->params['controller'].'/'.$file;
 		}
 		
+		// Set a few variables. I just like the way comments break up code.
 		$this->file = $file;
-		$this->format = Router::Instance()->params['format'];
-		$this->path = VIEW_DIR.'/'.$this->file.'.'.$this->format.'.php';
-		$this->data = array_merge((array)Controller::$data['global'],(array)$data);
+		$this->data = $data;
 	}
 	
 	/**
@@ -79,7 +81,12 @@ class View
 	 **/
 	private function __set($property,$value)
 	{
-		$this->data[$property] = $value;
+		if (substr($property,0,7) === 'global_') {
+			self::$global_data[substr($property,7)] = $value;
+		} else {
+			$this->data[$property] = $value;	
+		}
+		
 	}
 	
 	/**
@@ -99,36 +106,70 @@ class View
 	}
 	
 	/**
+	 * Initializes a few global items.
+	 *
+	 * @return void
+	 **/
+	static function send_headers($format)
+	{
+		// All views will use this format for rendering views
+		self::$format = $format;
+		
+		// Set the headers
+		if (isset(self::$content_types[self::$format])) {
+			header('Content-type: '.self::$content_types[self::$format]);
+		} else {
+			// Throw an error if the view is missing
+			throw new Error('unsupported_format', array('format' => self::$format));
+		}
+	}
+	
+	public function locate_file($file,$format)
+	{
+		// Add the file extension?
+		if (FALSE === strrpos($file,'.')) {
+			$file = $file.'.'.$format.'.php';
+		}
+
+		// Create the full path
+		$path = VIEW_DIR.'/'.$file;
+		
+		// Ensure it exists
+		if (!file_exists($path)) {
+			// Throw an error if the view is missing
+			throw new Error('missing_view', array('view_path' => $path));
+		}
+		
+		return $path;
+	}
+		
+	/**
 	 * Renders a view.
 	 *
 	 * @return string
 	 **/
 	public function process()
-	{				
-		if (file_exists($this->path) && !empty(self::$content_type[$this->format])) {
-			// Extract the data. A manual extract, using foreach,
-			// while capable of much more detailed error-checking
-			// is significantly slower than extract()	
-			if (is_array($this->data)) {
-				extract($this->data,EXTR_SKIP);
-			}
-			
-			// Set the headers
-			header('Content-type: '.self::$content_type[$this->format]);
-
-			// Buffer the output
-			ob_start();
-			include $this->path;
-			$this->view = ob_get_clean();
-			
-			// Return the string
-			return $this->view;
-			
-		} else {
-			
-			// Throw an error if the view is missing
-			throw new Error('missing_view', array('view_path' => $this->path));
+	{		
+		// Make sure there is a path to work with
+		if ($this->path == null) { 
+			$this->path = $this->locate_file($this->file,self::$format);
 		}
+		
+		// Merge local and global data
+		$this->data = array_merge((array)self::$global_data,$this->data);
+		
+		// Extract the data.	
+		if (is_array($this->data)) {
+			extract($this->data,EXTR_SKIP);
+		}
+
+		// Buffer the output
+		ob_start();
+		include $this->path;
+		$this->view = ob_get_clean();
+		
+		// Return the string
+		return $this->view;
 	}
 	
 	/**
@@ -144,13 +185,6 @@ class View
 	 **/
 	static function render($file = null,$data = array())
 	{
-		// If the file is null, we'll assume it's a call for the
-		// default view to be rendered
-		if ($file === null) {
-			$file = Router::Instance()->params['action'];
-			$data = Controller::$data['local'];
-		}
-
 		// Instantiate the view
 		$view = new View($file,$data);
 
@@ -203,47 +237,30 @@ class View
 	 **/
 	static function render_collection($file = null,$data = array())
 	{
-		// Determine the variable name that is passed to the partial
-		$data_name = basename($file);
-		$data_name = inflector::uglify(ltrim($data_name,'_'),'singularize');
+		// Instantiate the Partial
+		$collection = new Collection($file,$data);
 
-		// Counter to be passed to the collection
-		$i = 0;
-		
-		// Total number of items - 1, since $i is zero-based
-		$total = count($data) - 1;
+		// Render it immediately
+		return $collection->process();
+	}
+}
 
-		// A few array keys
-		$data_key = $data_name.'_key';
-		$data_counter = $data_name.'_counter';
-		$data_first = 'first_'.$data_name;
-		$data_last = 'last_'.$data_name;
-
-		// Final rendered content
-		$collection = '';
-
-		// Loop through each item in the array, rendering a partial and 
-		// passing some data to the file
-		foreach ($data as $key => $value) {
-
-			// Data to be passed
-			$partial_data = array(
-				$data_first 	=> ($i === 0) ? true : false,
-				$data_name 		=> $value,
-				$data_key 		=> $key,
-				$data_counter	=> $i,
-				$data_last 		=> ($i === $total) ? true : false,
-			);
-
-			// Render it
-			$partial = new Partial($file,$partial_data);
-			$collection .= $partial->process()."\n";
-
-			// Increment the counter
-			++$i;
+class Layout extends View
+{
+	/**
+	 * Sets up a partial to be processed and rendered.
+	 * 
+	 * @param string
+	 * @param array
+	 *
+	 **/
+	function __construct($file = null,$data = array())
+	{														
+		if (substr($file,0,9) != '/layouts/') {
+			$file = '/layouts/'.trim($file,'/');
 		}
 
-		return $collection;
+		parent::__construct($file,$data);
 	}
 }
 
@@ -275,5 +292,80 @@ class Partial extends View
 		parent::__construct($file,$data);
 	}
 }
+
+class Collection extends Partial
+{
+	// Counter
+	public $i = 0;
+	
+	// Total number of items
+	public $total = 0;
+	
+	// Variable names passed to each collection
+	public $name = null;
+	public $key = null;
+	public $counter = null;
+	public $first = null;
+	public $last = null;
+	
+	// Full Collection Data
+	public $collection_data = array();
+	
+	function __construct($file = null,$data = array()) 
+	{			
+		// Determine the variable name that is passed to the partial
+		$this->name = basename($file);
+		$this->name = inflector::uglify(ltrim($this->name,'_'),'singularize');
+		
+		// Total number of items - 1, since $i is zero-based
+		$this->total = count($data) - 1;
+
+		// A few array keys
+		$this->key = $this->name.'_key';
+		$this->counter = $this->name.'_counter';
+		$this->first = 'first_'.$this->name;
+		$this->last = 'last_'.$this->name;
+		
+		// Save the collection data
+		$this->collection_data = $data;
+		
+		// Good to go. Don't pass on the data because it doesn't need to be.
+		parent::__construct($file);
+		
+	}
+	
+	public function process()
+	{
+		// Final rendered content is stored here
+		$collection = '';
+		
+		// Loop through each item in the array, rendering a partial and 
+		// passing some data to the file
+		foreach ($this->collection_data as $key => $value) {
+
+			// Data to be passed
+			$data = array(
+				$this->first 	=> ($this->i === 0) ? true : false,
+				$this->name 	=> $value,
+				$this->key 		=> $key,
+				$this->counter	=> $this->i,
+				$this->last		=> ($this->i === $this->total) ? true : false,
+			);
+
+			// Reset the data
+			$this->data = $data;
+
+			// Increment the counter
+			$this->i++;
+			
+			// Call the parent processing function
+			$collection .= parent::process();
+		}
+		
+		$this->view = $collection;
+		return $collection;
+	}
+}
+
 
 ?>

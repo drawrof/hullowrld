@@ -5,18 +5,16 @@ class Controller
 	// Controller Singleton
 	public static $instance = null;
 	
-	// Controller Data that is passed to the view
-	public static $data = array(
-		'local' => array(),
-		'global' => array(),
-	);
-	
 	// Default layout to use
+	// Later converted to a View Object
 	public $layout = null;
+	
+	// Final View to be used
+	public $content = null;
 	
 	// Formats that the controller responds to
 	public $responds_to = array('html');
-
+	
 	public function __construct()
 	{		
 		// Set the instance
@@ -34,33 +32,17 @@ class Controller
 		// Attempt to instantiate a model with the same name is the controller
 		$model = $this->Params['Model'];
 		$this->$model = Model::Factory($this->Params['Model'],$this->Params['id'],true);
+						
+		// Instantiate the Layout and View Objects so that the controller has access to them
+		$this->content = new View($this->Params['action']);
+		
+		if (!empty($this->layout)) {
+			$this->layout = new Layout($this->layout);
+			$this->layout->content = $this->content;
+		}
 		
 		// Load template data
 		$this->load_view_data($this->Params['controller'],$this->Params['action']);
-	}
-
-	/**
-	 * Captures all instance variables set within the controller, which are then made available to the views
-	 * Variables beginning with a capital letter are "Global", in that all views have access to them. Lowercase
-	 * variables are only made available to the layout and default view; Partials cannot touch them.
-	 *
-	 * @return void
-	 **/
-	private function __set($name,$value)
-	{
-		// Mimic default functionality...
-		$this->$name = $value;
-						
-		// But capture it for use in the view
-		if ($name[0] === ucfirst($name[0])) {
-			$location = 'global';
-		} else {
-			$location = 'local';
-		}	
-		
-		if (empty(self::$data[$location][$name])) {
-			self::$data[$location][$name] =& $this->$name;
-		}
 	}
 	
 	/**
@@ -95,22 +77,16 @@ class Controller
 	 * @return string
 	 **/
 	private function __toString()
-	{		
-		// Load a layout if one is set by the controller
+	{	
+		// Process the view first. That way, if it really needs it
+		// It can access $this->layout;
+		$view = $this->content->process();
+		
 		if (!empty($this->layout)) {
-			$file = '/layouts/'.$this->layout;
-			
-		// Otherwise load a view based on the name of action
-		} else {
-			$file = $this->Params['action'];
+			$view = $this->layout->process();
 		}
 		
-		// Set the data
-		$data = self::$data['local'];
-				
-		// Let __toString() do its magic
-		$view = new View($file,$data);
-		return (string)$view;
+		return $view;
 	}
 	
 	/**
@@ -140,13 +116,25 @@ class Controller
 		// Set the array key to be searched
 		$route = $controller.'/'.$action;
 		
-		// Loop through each possible key
-		$keys = array('_default',$controller,$route);
+		// All of the keys
+		$keys = array(
+			'_content' 				=> $this->content,
+			'_layout'		 		=> $this->layout,
+			$controller.'_content'	=> $this->content,
+			$controller.'_layout' 	=> $this->layout,
+			$route.'_content'		=> $this->content,
+			$route.'_layout'		=> $this->layout,
+		);
+		
+		// Go through each one
+		foreach ($keys as $key => $view) {
 			
-		foreach ($keys as $key) {
+			// Shouldn't continue if it's empty
 			if (!empty($config[strtolower($key)])) {
+				
+				// Load the template data
 				foreach ($config[$key] as $template_key => $template_val) {
-					$this->$template_key = $template_val;
+					$view->$template_key = $template_val;
 				} 
 			}
 		}

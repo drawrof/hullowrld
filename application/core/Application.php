@@ -26,13 +26,16 @@ class App {
 		$controller =& $params['Controller'];
 		$controller = new $controller;
 		$controller->$action($params);
-	
+		
+		// Send the Headers.
+		View::send_headers($params['format']);
+		
 		// Save this for caching and the like
 		self::$output = (string)$controller;		
-		
+
 		// Send it to the browser
 		echo self::$output;
-		
+
 		// Start the wind-down process
 		// Cache the current route, since we had
 		// a successful request

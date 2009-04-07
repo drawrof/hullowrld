@@ -14,6 +14,7 @@ class Error extends Exception {
 		// Views
 		'missing_view' => array('The view "{view_path}" does not exist.', 500),
 		'variable_collision' => array('A variable collision occurred in {view_path}.', 500),
+		'unsupported_format' => array('Views are not currently configured to support the "{format}" format.',500),
 		
 		// Router
 		'no_route_match' => array('The incoming URI "{uri}" did not match any of the configured routes.',404),

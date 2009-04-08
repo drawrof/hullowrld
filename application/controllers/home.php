@@ -7,8 +7,7 @@ class HomeController extends ApplicationController
 	public function index() 
 	{
 		$this->content->memory_used = round(memory_get_peak_usage()/1024/1024,2);
-		$this->content->backtrace = debug_backtrace();	
-		
+		$this->content->backtrace = debug_backtrace();			
 		// Don't like calling view::render* inside your views or need 
 		// more control over the data that you pass to it?
 		// Simply use $this->content->foo = new View('foo');

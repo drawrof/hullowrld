@@ -34,8 +34,7 @@ class View
 	public $view = null;
 
 	/**
-	 * Sets up a view to be processed and rendered. Gathers full path information
-	 * and data to be used by the view.
+	 * Sets up a view to be processed and rendered. 
 	 * 
 	 * @param string
 	 * @param array
@@ -73,7 +72,11 @@ class View
 	}
 	
 	/**
-	 * Sets a property in the View data.
+	 * Sets a property in the View data. Global
+	 * variables can be created, which are available
+	 * to all views, by prefixing them with 'global_'.
+	 * e.g. $this->content->global_foo = 'bar'
+	 * makes $foo available to all views.
 	 * 
 	 * @param string
 	 * @param mixed
@@ -106,7 +109,7 @@ class View
 	}
 	
 	/**
-	 * Initializes a few global items.
+	 * Sends headers based on format determined by the Router
 	 *
 	 * @return void
 	 **/
@@ -120,10 +123,15 @@ class View
 			header('Content-type: '.self::$content_types[self::$format]);
 		} else {
 			// Throw an error if the view is missing
-			throw new Error('unsupported_format', array('format' => self::$format));
+			throw new ViewException('unsupported_format', array('format' => self::$format));
 		}
 	}
 	
+	/**
+	 * Determine that there is a file to work with.
+	 *
+	 * @return void
+	 **/
 	public function locate_file($file,$format)
 	{
 		// Add the file extension?
@@ -137,7 +145,7 @@ class View
 		// Ensure it exists
 		if (!file_exists($path)) {
 			// Throw an error if the view is missing
-			throw new Error('missing_view', array('view_path' => $path));
+			throw new ViewException('missing_view', array('view_path' => $path));
 		}
 		
 		return $path;
@@ -173,17 +181,14 @@ class View
 	}
 	
 	/**
-	 * Factory for rendering Views. If no arguments are passed to it, it renders
-	 * a file based on the name of the action for this request. Note that this, and all of
-	 * the static render* functions return a string, so that the view must be explicitly sent
-	 * to the browser, however, you can also process it further if you wish.
+	 * Factory for Views.
 	 * 
 	 * @param string
 	 * @param array
 	 *
 	 * @return string
 	 **/
-	static function render($file = null,$data = array())
+	static function render($file, $data = array())
 	{
 		// Instantiate the view
 		$view = new View($file,$data);
@@ -193,16 +198,14 @@ class View
 	}
 	
 	/**
-	 * Factory for rendering Partials. Essentially, it is an alias
-	 * of View::render, except it adds an underscore to the filename
-	 * ala Rails.
+	 * Factory for Partials. 
 	 * 
 	 * @param string
 	 * @param array
 	 *
 	 * @return string
 	 **/
-	static function render_partial($file = null,$data = array())
+	static function render_partial($file, $data = array())
 	{		
 		// Instantiate the Partial
 		$partial = new Partial($file,$data);

@@ -199,7 +199,7 @@ class ORMLibrary {
 		if (method_exists($this->db, $method))
 		{
 			if (in_array($method, array('query', 'get', 'insert', 'update', 'delete')))
-				throw new Error('query_methods_not_allowed',array());
+				throw new DatabaseException('query_methods_not_allowed',array());
 
 			// Method has been applied to the database
 			$this->db_applied[$method] = $method;
@@ -248,7 +248,7 @@ class ORMLibrary {
 		}
 		else
 		{
-			throw new Error(
+			throw new DatabaseException(
 				'invalid_method',
 				array( 
 					'method' => $method, 

@@ -18,7 +18,6 @@ class Config {
 	
 	// Cache Directory
 	public $cache_file;
-	
 
 	/**
 	 * Loads the configuration
@@ -35,7 +34,7 @@ class Config {
 		$this->cache_file = CACHE_DIR.'config.cache';
 		
 		// Load the cached configuration object if it exits
-		if ($this->cache_file && file_exists($this->cache_file) && APP_ENV === 'production') {
+		if (file_exists($this->cache_file) && IN_PRODUCTION) {
 
 			$this->cache = unserialize(file_get_contents($this->cache_file));
 			$this->is_cached = true;
@@ -54,7 +53,8 @@ class Config {
 								'.DS_Store',
 								'.svn',
 								'Thumbs.db',
-								'filesystem'.EXT
+								'filesystem'.EXT,
+								'exception'.EXT
 							);
 				
 				// Read the directory
@@ -66,7 +66,7 @@ class Config {
 					// Each file's array of configuration directives
 					// is held by a single variable whose name is
 					// equal to the filename minus EXT
-					$key = inflector::underscore(str_replace(EXT,'',$file));
+					$key = strtolower(str_replace(EXT,'',$file));
 
 					// Process the configuration
 					include $this->config_dir.$file;
@@ -81,7 +81,7 @@ class Config {
 				// Finished here
 				closedir($handle);
 			} else {
-				throw new Error('unreadable_config_directory', array('path' => $this->config_dir));
+				throw new ConfigException('unreadable_directory', array('path' => $this->config_dir));
 			}
 			
 			// Flag to regenerate the cache
@@ -124,7 +124,7 @@ class Config {
 	 **/
 	function __destruct()
 	{								
-		if ($this->regenerate === true && APP_ENV === 'production') {
+		if ($this->regenerate === true && IN_PRODUCTION) {
 			file_put_contents($this->cache_file,serialize($this->cache));
 		}
 	}

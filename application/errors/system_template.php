@@ -164,13 +164,13 @@
 	<body>
 		<div class='container'>
 			<h1>
-				<span class='icon'>&times;</span> <?=$error_name?> in <span class='file'>&#8220;<?=$class.$type.$method?>()&#8221;</span>
+				<span class='icon'>&times;</span> <?=$error?> in <span class='file'>&#8220;<?=$class.$type.$method?>()&#8221;</span>
 				 <? if (!empty($line)): ?>
 					near line <span class='line'><?=$line?></span>
 				<? endif; ?>
 			</h1>
 			<div class='content'>
-				<?=$error_string?>
+				<?=$message?>
 			</div>
 		</div>
 		<div id='trace'>

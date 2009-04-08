@@ -250,7 +250,7 @@ abstract class Database_Driver {
 	 */
 	public function notregex($field, $match, $type, $num_regexs)
 	{
-		throw new Error(
+		throw new DatabaseException(
 			'database_not_implemented',
 			array(
 				'function' => __FUNCTION__,
@@ -286,7 +286,7 @@ abstract class Database_Driver {
 	 */
 	public function merge($table, $keys, $values)
 	{
-		throw new Error(
+		throw new DatabaseException(
 			'database_not_implemented',
 			array(
 				'function' => __FUNCTION__,
@@ -311,7 +311,7 @@ abstract class Database_Driver {
 	 */
 	public function stmt_prepare($sql = '')
 	{
-		throw new Error(
+		throw new DatabaseException(
 			'database_not_implemented',
 			array(
 				'function' => __FUNCTION__,
@@ -612,7 +612,7 @@ abstract class DatabaseResult implements ArrayAccess, Iterator, Countable {
 	 */
 	final public function offsetSet($offset, $value)
 	{
-		throw new Error(
+		throw new DatabaseException(
 			'database_result_read_only',
 			array(
 				'function' => __FUNCTION__,
@@ -627,7 +627,7 @@ abstract class DatabaseResult implements ArrayAccess, Iterator, Countable {
 	 */
 	final public function offsetUnset($offset)
 	{
-		throw new Error(
+		throw new DatabaseException(
 			'database_result_read_only',
 			array(
 				'function' => __FUNCTION__,

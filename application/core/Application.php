@@ -15,6 +15,9 @@ class App {
 		include CORE_DIR.'View'.EXT;
 		include CORE_DIR.'Controller'.EXT;
 		include CORE_DIR.'Model'.EXT;
+		
+		// Include the inflector as well. The autoload is unfortunately rather slow.
+		include HELPER_DIR.'inflector'.EXT;
 				
 		// Instantiate a couple of Core Classes
 		$config =& Config::Instance();
@@ -23,7 +26,7 @@ class App {
 
 		// Instantiate the controller and call the requested action
 		$action = $params['action'];
-		$controller =& $params['Controller'];
+		$controller = $params['Controller'];
 		$controller = new $controller;
 		$controller->$action($params);
 		
@@ -45,7 +48,7 @@ class App {
 	static function autoload($fullname)
 	{				
 		// Controller
-		if (FALSE !== strpos($fullname,'Controller')) {
+		if (substr($fullname,-10) === 'Controller') {
 
 			$type = "Controller";
 			$file = inflector::underscore(substr($fullname,0,-10));
@@ -76,9 +79,9 @@ class App {
 			$path = DRIVER_DIR.$file.EXT;
 		
 		// Error	
-		} else if ($fullname == 'Error') {
+		} else if (substr($fullname,-9) === 'Exception') {
 			
-			require CORE_DIR.'Error'.EXT;
+			require CORE_DIR.'Exception'.EXT;
 			return;
 			
 		// Models
@@ -86,13 +89,15 @@ class App {
 			
 			$type = "Model";
 			$path = MODEL_DIR.inflector::underscore($fullname).EXT;
-			
+
 		}
 		
-		// Potentially throw different errors for different types
+		// Throw different errors for different types
 		if ($type === 'Controller') {
+			$exception = 'ControllerException';
 			$error = 'missing_controller';
 		} else {
+			$exception = 'AppException';
 			$error = 'missing_class';
 		}
 		
@@ -102,7 +107,7 @@ class App {
 			
 			// Ensure that the class exists
 			if (!class_exists($fullname,false)) {
-				throw new Error(
+				throw new $exception(
 					$error,
 					array(
 						'class' => $fullname,
@@ -114,7 +119,7 @@ class App {
 			
 		// Too bad
 		} else {
-			throw new Error(
+			throw new $exception(
 				$error,
 				array(
 					'class' => $fullname,

@@ -304,7 +304,7 @@ class Database_Mysql_Driver extends Database_Driver {
 		}
 
 		if (!isset($tables[$table])) {
-			throw new Error(
+			throw new DatabaseException(
 				'database_table_not_found', 
 				array(
 					'tables' => $table
@@ -368,7 +368,7 @@ class MysqlResult extends DatabaseResult {
 			if ($result == FALSE)
 			{
 				// SQL error
-				throw new Error(
+				throw new DatabaseException(
 					'database_error',
 				 	array(
 						'db_error' => mysql_error($link),

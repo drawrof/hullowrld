@@ -125,7 +125,7 @@ class DatabaseLibrary {
 		{
 			// Make sure the connection is valid
 			if (strpos($this->config['connection'], '://') === FALSE) {
-				throw new Error(
+				throw new DatabaseException(
 					'invalid_db_connection_string',
 					array('connection' => $this->config['connection'])
 				);
@@ -215,7 +215,7 @@ class DatabaseLibrary {
 		{
 			$this->link = $this->driver->connect();
 			if ( ! is_resource($this->link) AND ! is_object($this->link)) {
-				throw new Error(
+				throw new DatabaseException(
 					'database_connection_error',
 					array(
 						'db_error' => $this->driver->show_error(),
@@ -858,13 +858,13 @@ class DatabaseLibrary {
 		}
 
 		if ($this->set == NULL) {
-			throw new Error('must_use_set');	
+			throw new DatabaseException('must_use_set');	
 		}
 
 		if ($table == '')
 		{
 			if ( ! isset($this->from[0])) {
-				throw new Error('missing_database_table');	
+				throw new DatabaseException('missing_database_table');	
 			}
 
 			$table = $this->from[0];
@@ -940,13 +940,13 @@ class DatabaseLibrary {
 		}
 
 		if ($this->set == NULL) {
-			throw new Error('must_use_set');	
+			throw new DatabaseException('must_use_set');	
 		}
 
 		if ($table == '')
 		{
 			if ( ! isset($this->from[0])) {
-				throw new Error('missing_database_table');	
+				throw new DatabaseException('missing_database_table');	
 			}
 
 			$table = $this->from[0];
@@ -985,7 +985,7 @@ class DatabaseLibrary {
 		if ($table == '')
 		{
 			if ( ! isset($this->from[0])) {
-				throw new Error('missing_database_table');	
+				throw new DatabaseException('missing_database_table');	
 			}
 
 			$table = $this->from[0];
@@ -1009,7 +1009,7 @@ class DatabaseLibrary {
 		if ($table == '')
 		{
 			if ( ! isset($this->from[0])) {
-				throw new Error('missing_database_table');	
+				throw new DatabaseException('missing_database_table');	
 			}
 
 			$table = $this->from[0];
@@ -1025,7 +1025,7 @@ class DatabaseLibrary {
 		}
 
 		if (count($this->where) < 1) {
-			throw new Error('must_use_where');	
+			throw new DatabaseException('must_use_where');	
 		}
 
 		$sql = $this->driver->delete($table, $this->where);

@@ -212,7 +212,7 @@ class ORMIteratorLibrary implements Iterator, ArrayAccess, Countable {
 	 */
 	public function offsetSet($offset, $value)
 	{
-		throw new Error('result_read_only');
+		throw new DatabaseException('result_read_only');
 	}
 
 	/**
@@ -222,7 +222,7 @@ class ORMIteratorLibrary implements Iterator, ArrayAccess, Countable {
 	 */
 	public function offsetUnset($offset)
 	{
-		throw new Error('result_read_only');
+		throw new DatabaseException('result_read_only');
 	}
 
 } // End ORM Iterator

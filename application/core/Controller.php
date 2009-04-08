@@ -54,12 +54,13 @@ class Controller
 	{
 		// Ensure that, at the very least, the view isn't a partial
 		$action = ltrim($action,'_');
-		$view = VIEW_DIR.$this->Params['controller'].$action.'.'.$this->Params['format'].EXT;
+		$view = VIEW_DIR.$this->Params['controller'].'/'.$action.'.'.$this->Params['format'].EXT;
 		
 		// Check for an actionless view, if doesn't exist 
-		// we throw. Otherwise, we let the view render it.
+		// we throw. Otherwise, the view class will pick it up
+		// and render it.
 		if (!file_exists($view)) {
-			throw new Error(
+			throw new ControllerException(
 				'missing_action',
 				array(
 					'action' => $action,
@@ -151,7 +152,7 @@ class Controller
 		$unknown = false;
 		
 		// Search on a per-action basis
-		if (!empty($this->responds_to[$action])) {
+		if (isset($this->responds_to[$action])) {
 			if (!in_array($format,$this->responds_to[$action])) {
 				$unknown = true;
 			}
@@ -160,7 +161,7 @@ class Controller
 		}
 		
 		if ($unknown) {
-			throw new Error(
+			throw new ControllerException(
 				'invalid_format', 
 				array(
 					'format' => $format,
@@ -181,7 +182,7 @@ class Controller
 		try {
 			$reflection = new ReflectionMethod($this,$action);
 			if (!$reflection->isPublic()) {
-				throw new Error(
+				throw new ControllerException(
 					'private_action',
 					array(
 						'action' => $action,
@@ -191,7 +192,7 @@ class Controller
 			}
 		} catch (Exception $e) {
 			// Exception will be caught when the method doesn't exist at all.
-			// Just return false and __call will pick up the missing action to generate
+			// Just return and __call will pick up the missing action to generate
 			// the proper error.
 			return;
 		}

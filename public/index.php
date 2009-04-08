@@ -3,18 +3,15 @@
 // Comment this line to default to your server's error reporting level
 error_reporting(E_ALL);
 
-// Starting point in time
-define('APP_START',microtime(true));
-
 // development: Verbose errors, Disabled Caching
 // production: Safe errors, Enabled Caching
-define('APP_ENV','development');
+define('IN_PRODUCTION',false);
 
 // Set a string inside the realpath function to the application directory
 // relative to this document. Absolute paths are acceptable as well.
 define('APP_DIR',rtrim(realpath('../application'),'/').'/');
 
-// Extension of files. 99% of the time this will be fine as .php.
+// Extension of all files. 99% of the time this will be fine as .php.
 define('EXT','.php');
 
 // -----------------------------------------------------

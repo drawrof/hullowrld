@@ -218,13 +218,13 @@ class Router {
 	{
 		// Did we even find anything?
 		if (empty($params)) {
-			throw new Error('no_route_match',array('uri' => "/".$this->string));
+			throw new RouterException('no_route_matched',array('uri' => "/".$this->string));
 		}
 		
 		// Validate specific params
 		foreach(self::$config['validate'] as $param) {
 			if (empty($params[$param])) {
-				throw new Error(
+				throw new RouterException(
 					'missing_parameter',
 					array(
 						'parameter' => $param,
@@ -238,9 +238,10 @@ class Router {
 		// the constructor must be public. The best way to get around this
 		// is to not allow actions starting with underscores to be recognized.
 		if (substr($params['action'],0,1) === '_') {
-			throw new Error(
-				'action_with_leading_underscore',
+			throw new RouterException(
+				'found_leading_underscore',
 				array(
+					'parameter' => 'action',
 					'action' => $params['action']
 				)
 			);
@@ -299,7 +300,7 @@ class Router {
 			return '/'.trim($route,'/');
 				
 		} else {
-			throw new Error('unknown_named_route',array('name' => $name));
+			throw new RouterException('unknown_named_route',array('name' => $name));
 		}
 	}
 	

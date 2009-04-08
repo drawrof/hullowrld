@@ -11,5 +11,5 @@
 	</ol>
 </div>
 <div id='profile'>
-	<p class='memory'>Rendered in <?=round((microtime(true) - APP_START) * 1000)?>ms using <?=$memory_used?>MB of memory</p>
+	<p class='memory'>Rendered in <?=round((microtime(true) - $_SERVER['REQUEST_TIME']) * 1000)?>ms using <?=$memory_used?>MB of memory</p>
 </div>

@@ -128,7 +128,7 @@ class View
 	{
 		// Add the file extension?
 		if (FALSE === strrpos($file,'.')) {
-			$file = $file.'.'.$format.'.php';
+			$file = $file.'.'.$format.EXT;
 		}
 
 		// Create the full path
@@ -315,8 +315,8 @@ class Collection extends Partial
 	{			
 		// Determine the variable name that is passed to the partial
 		$this->name = basename($file);
-		$this->name = inflector::uglify(ltrim($this->name,'_'),'singularize');
-		
+		$this->name = inflector::underscore(ltrim($this->name,'_'));
+
 		// Total number of items - 1, since $i is zero-based
 		$this->total = count($data) - 1;
 

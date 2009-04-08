@@ -73,7 +73,7 @@ class Error extends Exception {
 	
 	private function display_production($error_code,$error,$data)
 	{
-		include ERROR_DIR.'/'.$error_code.'.php';
+		include ERROR_DIR.$error_code.EXT;
 		exit;
 	}
 	
@@ -107,7 +107,7 @@ class Error extends Exception {
 		for($i=0; $i <= ob_get_level(); $i++) {
 			ob_end_clean();
 		}
-		include ERROR_DIR.'/system_template.php';
+		include ERROR_DIR.'system_template'.EXT;
 		exit;
 	}
 	
@@ -138,7 +138,7 @@ class Error extends Exception {
 
 			if (isset($entry['file']))
 			{
-				$temp .= "<strong>File:</strong> ".str_replace(SUPER_ROOT,'',$entry['file']);
+				$temp .= "<strong>File:</strong> ".str_replace(APP_ROOT,'',$entry['file']);
 			} else {
 				$temp .= "<strong>File:</strong> None";
 			}
@@ -165,7 +165,7 @@ class Error extends Exception {
 					if (is_string($arg) AND is_file($arg))
 					{
 						// Remove docroot from filename
-						$arg = preg_replace('!^'.preg_quote(SUPER_ROOT).'!', '', $arg);
+						$arg = preg_replace('!^'.preg_quote(APP_ROOT).'!', '', $arg);
 					}
 					
 					if (is_array($arg)) {

@@ -88,7 +88,7 @@ class ORMLibrary {
 	public function __construct($id = NULL)
 	{
 		// Set the object name and plural name
-		$name = inflector::beautify(get_class($this));
+		$name = inflector::camelize(get_class($this));
 		Model::$instances[$name] = $this;
 				
 		$this->object_name   = strtolower(get_class($this));

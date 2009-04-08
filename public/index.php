@@ -12,17 +12,20 @@ define('APP_ENV','development');
 
 // Set a string inside the realpath function to the application directory
 // relative to this document. Absolute paths are acceptable as well.
-define('APP_DIR',realpath('../application'));
+define('APP_DIR',rtrim(realpath('../application'),'/').'/');
+
+// Extension of files. 99% of the time this will be fine as .php.
+define('EXT','.php');
 
 // -----------------------------------------------------
 // You shouldn't need to change anything below this line
 // -----------------------------------------------------
 
 // Include all of the directory layout constants
-require APP_DIR.'/config/filesystem.php';
+require APP_DIR.'config/filesystem'.EXT;
 
 // Main Initialization class
-require CORE_DIR.'/Application.php';
+require CORE_DIR.'Application'.EXT;
 
 // Call the Init Function and we're off
 App::Init();

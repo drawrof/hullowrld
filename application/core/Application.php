@@ -10,11 +10,11 @@ class App {
 		
 		// These will be loaded every request anyway, 
 		// so there's no point letting the __autoload catch them.
-		include CORE_DIR.'/Router.php';
-		include CORE_DIR.'/Config.php';
-		include CORE_DIR.'/View.php';
-		include CORE_DIR.'/Controller.php';
-		include CORE_DIR.'/Model.php';
+		include CORE_DIR.'Router'.EXT;
+		include CORE_DIR.'Config'.EXT;
+		include CORE_DIR.'View'.EXT;
+		include CORE_DIR.'Controller'.EXT;
+		include CORE_DIR.'Model'.EXT;
 				
 		// Instantiate a couple of Core Classes
 		$config =& Config::Instance();
@@ -48,20 +48,20 @@ class App {
 		if (FALSE !== strpos($fullname,'Controller')) {
 
 			$type = "Controller";
-			$file = inflector::uglify(substr($fullname,0,-10));
-			$path = self::check_path($file,CONTROLLER_DIR);
+			$file = inflector::underscore(substr($fullname,0,-10));
+			$path = CONTROLLER_DIR.$file.EXT;
 			
 		// Helper
 		} else if ($fullname[0] !== ucfirst($fullname[0])) {
 			
 			$type = "Helper";
-			$path = self::check_path($fullname,HELPER_DIR);
+			$path = HELPER_DIR.$fullname.EXT;
 		
 		// Libraries	
 		} else if (substr($fullname,-7) === 'Library') {
 			
 			$type = "Library";
-			$path = self::check_path(substr($fullname,0,-7),LIB_DIR);
+			$path = LIB_DIR.substr($fullname,0,-7).EXT;
 	
 		// Drivers
 		} else if (substr($fullname,-6) === 'Driver') {
@@ -73,19 +73,19 @@ class App {
 			$file = str_replace('_','/',$file);
 			
 			$type = "Driver";
-			$path = self::check_path($file,DRIVER_DIR);
+			$path = DRIVER_DIR.$file.EXT;
 		
 		// Error	
 		} else if ($fullname == 'Error') {
 			
-			require CORE_DIR.'/Error.php';
+			require CORE_DIR.'Error'.EXT;
 			return;
 			
 		// Models
 		} else {
 			
 			$type = "Model";
-			$path = self::check_path(inflector::uglify($fullname),MODEL_DIR);
+			$path = MODEL_DIR.inflector::underscore($fullname).EXT;
 			
 		}
 		
@@ -123,29 +123,5 @@ class App {
 				)
 			);
 		}
-	}
-	
-	/**
-	 * Appends a file and extension to a particular system path.
-	 *
-	 * @param string
-	 * @param string
-	 * @param mixed
-	 * 
-	 * @return string
-	 **/
-	static function check_path($file, $path, $ext = 'php') 
-	{
-		// Is there an extension? If not, we append one
-		if (strrpos($file,'.'.$ext) === false && $ext != false){ 
-			$file = $file.".".$ext; 
-		}
-		
-		// Is there a leading slash? If not, we append an absolute path
-		if (substr($file,0,1) != '/' && $path != false) {
-			$file = rtrim($path,'/')."/".$file;	
-		}
-			
-		return $file;
 	}
 }

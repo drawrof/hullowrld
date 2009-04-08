@@ -54,7 +54,7 @@ class Controller
 	{
 		// Ensure that, at the very least, the view isn't a partial
 		$action = ltrim($action,'_');
-		$view = VIEW_DIR.'/'.$this->Params['controller'].'/'.$action.'.'.$this->Params['format'].'.php';
+		$view = VIEW_DIR.$this->Params['controller'].$action.'.'.$this->Params['format'].EXT;
 		
 		// Check for an actionless view, if doesn't exist 
 		// we throw. Otherwise, we let the view render it.

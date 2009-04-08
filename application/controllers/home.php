@@ -1,7 +1,7 @@
 <?php
 
-class HomeController extends ApplicationController {
-	
+class HomeController extends ApplicationController 
+{
 	var $layout = 'home';
 	
 	public function index() 

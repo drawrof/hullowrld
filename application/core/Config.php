@@ -19,7 +19,6 @@ class Config {
 	// Cache Directory
 	public $cache_file;
 	
-	// App Environment
 
 	/**
 	 * Loads the configuration
@@ -33,7 +32,7 @@ class Config {
 		
 		// Set a few required properties
 		$this->config_dir = CONFIG_DIR;
-		$this->cache_file = CACHE_DIR.'/config.cache';
+		$this->cache_file = CACHE_DIR.'config.cache';
 		
 		// Load the cached configuration object if it exits
 		if ($this->cache_file && file_exists($this->cache_file) && APP_ENV === 'production') {
@@ -55,7 +54,7 @@ class Config {
 								'.DS_Store',
 								'.svn',
 								'Thumbs.db',
-								'filesystem.php'
+								'filesystem'.EXT
 							);
 				
 				// Read the directory
@@ -66,11 +65,11 @@ class Config {
 			
 					// Each file's array of configuration directives
 					// is held by a single variable whose name is
-					// equal to the filename minus '.php'
-					$key = strtolower(str_replace('.php','',$file));
+					// equal to the filename minus EXT
+					$key = inflector::underscore(str_replace(EXT,'',$file));
 
 					// Process the configuration
-					include $this->config_dir.'/'.$file;
+					include $this->config_dir.$file;
 
 					// Add $config to the cache
 					if (isset($config)) {
@@ -81,7 +80,6 @@ class Config {
 			
 				// Finished here
 				closedir($handle);
-				
 			} else {
 				throw new Error('unreadable_config_directory', array('path' => $this->config_dir));
 			}

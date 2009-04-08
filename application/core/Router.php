@@ -191,14 +191,13 @@ class Router {
 	private function populate_params($params)
 	{
 		$extra = array(
-			'Controller' => inflector::beautify($this->params['controller']."Controller"),
-			'controller' => inflector::uglify($this->params['controller']),
+			'Controller' => inflector::camelize($this->params['controller']."Controller"),
+			'controller' => inflector::underscore($this->params['controller']),
 			
-			'Model' => inflector::beautify($this->params['controller'],'singularize'),
-			'model' => inflector::uglify($this->params['controller'],'singularize'),
+			'Model' => inflector::classify($this->params['controller']),
+			'model' => inflector::tableize($this->params['controller']),
 
-			'Action' => inflector::beautify($this->params['action']),
-			'action' => inflector::uglify($this->params['action']),
+			'action' => inflector::underscore($this->params['action']),
 			
 			'URI' => $this->original,
 			'Route' => $this->string,

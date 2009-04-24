@@ -1,4 +1,4 @@
-<?php
+<?php defined('ROOT') or die ('Restricted Access');
 
 // For the most part, nothing needs to be changed for this file.
 // It basically contains human-readable messages for 

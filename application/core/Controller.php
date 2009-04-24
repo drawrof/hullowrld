@@ -1,4 +1,4 @@
-<?php
+<?php defined('ROOT') or die ('Restricted Access');
 
 class Controller
 {
@@ -21,7 +21,7 @@ class Controller
 		self::$instance = $this;
 		
 		// Abstract away the router
-		$this->Params =& Router::Instance()->params;
+		$this->Params =& Router::$params;
 		
 		// Verify a proper response exists
 		$this->responds_to($this->Params['action'],$this->Params['format']);
@@ -37,7 +37,7 @@ class Controller
 		$this->content = new View($this->Params['action']);
 		
 		if (!empty($this->layout)) {
-			$this->layout = new Layout($this->layout);
+			$this->layout = new ViewLayout($this->layout);
 			$this->layout->content = $this->content;
 		}
 		

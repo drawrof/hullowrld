@@ -1,4 +1,4 @@
-<?php
+<?php defined('ROOT') or die ('Restricted Access');
 
 class App {
 	
@@ -21,8 +21,7 @@ class App {
 				
 		// Instantiate a couple of Core Classes
 		$config =& Config::Instance();
-		$router =& Router::Instance();
-		$params = $router->params;
+		$params = Router::Setup();
 
 		// Instantiate the controller and call the requested action
 		$action = $params['action'];
@@ -42,7 +41,7 @@ class App {
 		// Start the wind-down process
 		// Cache the current route, since we had
 		// a successful request
-		Router::Instance()->cache();
+		Router::cache();
  	}
 
 	static function autoload($fullname)

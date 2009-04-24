@@ -1,4 +1,4 @@
-<?php
+<?php defined('ROOT') or die ('Restricted Access');
 
 class HomeController extends ApplicationController 
 {

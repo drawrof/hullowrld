@@ -1,5 +1,4 @@
-<?php
-defined('ROOT') or die ('Restricted Access');
+<?php defined('ROOT') or die ('Restricted Access');
 
 class SessionLibrary {
 	

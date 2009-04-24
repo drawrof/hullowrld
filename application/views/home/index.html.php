@@ -1,3 +1,4 @@
+<?php defined('ROOT') or die ('Restricted Access'); ?>
 <div class='content'>
 	<p>
 		The page you are viewing is located in &#8220;<span class='code'>/views/home/index.html.php</span>&#8221;. By default, the system renders a view with a 

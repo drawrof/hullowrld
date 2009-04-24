@@ -18,6 +18,9 @@ define('EXT','.php');
 // You shouldn't need to change anything below this line
 // -----------------------------------------------------
 
+// Root Directory, containing this file
+define('ROOT',rtrim(realpath(dirname(__FILE__)),'/').'/');
+
 // Include all of the directory layout constants
 require APP_DIR.'config/filesystem'.EXT;
 

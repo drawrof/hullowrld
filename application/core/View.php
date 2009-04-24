@@ -1,4 +1,4 @@
-<?php
+<?php defined('ROOT') or die ('Restricted Access');
 
 class View 
 {	
@@ -49,7 +49,7 @@ class View
 			
 		// Otherwise, VIEW_DIR/current_controller/ will be the working directory.
 		} else {
-			$file = Router::Instance()->params['controller'].'/'.$file;
+			$file = Router::$params['controller'].'/'.$file;
 		}
 		
 		// Set a few variables. I just like the way comments break up code.
@@ -140,7 +140,7 @@ class View
 		}
 
 		// Create the full path
-		$path = VIEW_DIR.'/'.$file;
+		$path = VIEW_DIR.$file;
 		
 		// Ensure it exists
 		if (!file_exists($path)) {
@@ -208,7 +208,7 @@ class View
 	static function render_partial($file, $data = array())
 	{		
 		// Instantiate the Partial
-		$partial = new Partial($file,$data);
+		$partial = new ViewPartial($file,$data);
 
 		// Render it immediately
 		return $partial->process();
@@ -241,14 +241,14 @@ class View
 	static function render_collection($file = null,$data = array())
 	{
 		// Instantiate the Partial
-		$collection = new Collection($file,$data);
+		$collection = new ViewCollection($file,$data);
 
 		// Render it immediately
 		return $collection->process();
 	}
 }
 
-class Layout extends View
+class ViewLayout extends View
 {
 	/**
 	 * Sets up a partial to be processed and rendered.
@@ -267,7 +267,7 @@ class Layout extends View
 	}
 }
 
-class Partial extends View
+class ViewPartial extends View
 {
 	/**
 	 * Sets up a partial to be processed and rendered.
@@ -296,7 +296,7 @@ class Partial extends View
 	}
 }
 
-class Collection extends Partial
+class ViewCollection extends ViewPartial
 {
 	// Counter
 	public $i = 0;
@@ -317,8 +317,9 @@ class Collection extends Partial
 	function __construct($file = null,$data = array()) 
 	{			
 		// Determine the variable name that is passed to the partial
-		$this->name = basename($file);
-		$this->name = inflector::underscore(ltrim($this->name,'_'));
+		$this->name = ltrim(basename($file),'_');
+		$this->name = inflector::singularize($this->name);
+		$this->name = inflector::underscore($this->name);
 
 		// Total number of items - 1, since $i is zero-based
 		$this->total = count($data) - 1;

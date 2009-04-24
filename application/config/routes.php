@@ -1,5 +1,5 @@
-<?php
-
+<?php defined('ROOT') or die ('Restricted Access');
+ 
 // This is the root route.
 $config[''] = array(
 	'controller' => 'home',

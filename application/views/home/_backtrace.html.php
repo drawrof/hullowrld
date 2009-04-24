@@ -1,3 +1,4 @@
+<?php defined('ROOT') or die ('Restricted Access'); ?>
 <li>
 	<span>
 		<strong>File:</strong> <?=isset($backtrace['file']) ? $backtrace['file'] : 'None' ?><br />

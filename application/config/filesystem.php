@@ -1,7 +1,4 @@
-<?php
-
-// Root Directory, containing this file
-define('ROOT',rtrim(realpath(dirname(__FILE__)),'/').'/');
+<?php defined('ROOT') or die ('Restricted Access');
 
 // Document Root, useful for outputting URLs
 define('DOCROOT',rtrim(str_replace(realpath($_SERVER['DOCUMENT_ROOT']),'',realpath(ROOT)),'/').'/');

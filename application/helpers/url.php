@@ -1,4 +1,4 @@
-<?php
+<?php defined('ROOT') or die ('Restricted Access');
 
 class url
 {
@@ -46,6 +46,19 @@ class url
 	
 	static function named($name, $params = array())
 	{
-		return DOCROOT.Router::link_to_named($name,$params);
+		if (isset(Router::$named_routes[(string)$name])) {
+						
+			$route = Router::$named_routes[(string)$name];
+			
+			// Parameters to fill?
+			foreach ($params as $key => $value) {
+				$route = str_replace(':'.$key, $value, $route);
+			}
+			
+			return DOCROOT.trim($route,'/');
+				
+		} else {
+			throw new RouterException('unknown_named_route',array('name' => $name));
+		}
 	}
 }

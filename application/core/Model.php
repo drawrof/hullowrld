@@ -1,9 +1,12 @@
-<?php
+<?php defined('ROOT') or die ('Restricted Access');
 
 class Model
 {	
+	// Holds all model Instances
+	static $instance = array();
+	
 	// Holds the database Object
-	var $database = 'default';
+	var $Database = 'default';
 	
 	// Saves the id if it was instantiated with it
 	var $id = null;
@@ -15,12 +18,15 @@ class Model
 	 * @return void
 	 **/
 	function __construct($id = null)
-	{		
+	{	
+		// Set our instance
+		self::$instances[get_class($this)] = $this;
+			
 		// Instantiate the Database
-		$this->Db = DatabaseLibrary::Instance($this->Db);
+		$this->Database = DatabaseLibrary::Instance($this->Database);
 		
 		// Set the first table
-		$this->Db->from(inflector::tableize(get_class($this)));
+		$this->Database->from(inflector::tableize(get_class($this)));
 	}
 	
 	/**
@@ -43,6 +49,14 @@ class Model
 			if (!file_exists($path)) {
 				return false;
 			}
+		}
+		
+		// Ensure the name is singular and properly capitalized
+		$name = inflector::classify($name);
+		
+		// Check the isntances
+		if (isset(self::$instances[$name])) {
+			return self::$instances[$name];
 		}
 		
 		return new $name($id);

@@ -1,4 +1,4 @@
-<?php
+<?php defined('ROOT') or die ('Restricted Access');
 
 $config['home/index_layout'] = array(
 		'title' => 'hellowrld - a simple PHP framework',

@@ -1,10 +1,7 @@
-<?php
-defined('ROOT') or die ('Restricted Access');
+<?php defined('ROOT') or die ('Restricted Access');
 
-class Router {
-	
-	static $instance = false;
-	
+class Router 
+{
 	// Some various configuration options
 	static $config = array(
 		
@@ -43,16 +40,16 @@ class Router {
 	static $named_routes = array();
 
 	// The original input
-	var $original = false;
+	static $original_uri = false;
 	
 	// After initial processing
-	var $string = false;
+	static $uri = false;
 				
 	// Found Paramaters
-	var $params = array();
+	static $params = array();
 	
 	// Whether the routes need to be cached
-	var $cache_routes = false;
+	static $cache_routes = false;
 
 	/**
 	 * Singleton access for the Router
@@ -60,26 +57,8 @@ class Router {
 	 * @return object
 	 *
 	 **/
-	static function Instance()
+	public static function Setup()
 	{
-		if (empty(self::$instance)) {
-			new Router;
-		}
-		
-		return self::$instance;
-	}
-	
-	/**
-	 * Router Constructor. Merges Config and begins processing.
-	 *
-	 * @return void
-	 *
-	 **/
-	function __construct()
-	{			
-		// Set the instance
-		self::$instance =& $this;
-
 		// Merge Config
 		$config = Config::Instance();
 		self::$config = array_merge(self::$config,$config->router);
@@ -90,17 +69,19 @@ class Router {
 		// ...and map them if they're not coming from the cache
 		if (!$config->is_cached) {
 						
-			array_walk(self::$routes,array($this,'map'));
+			array_walk(self::$routes,'Router::map');
 			
 			// Flag the cache
-			$this->cache_routes = true;
+			self::$cache_routes = true;
 		}
 
 		// Begin URI Processing
-		$this->process_uri();
-		$this->process_routes();
+		self::process_uri();
+		self::process_routes();
+		
+		return self::$params;
 	}
-	
+		
 	/**
 	 * Sends various parts of the routing system to the Config
 	 * Class for caching in production mode
@@ -108,21 +89,21 @@ class Router {
 	 * @return void
 	 *
 	 **/
-	public function cache()
+	public static function cache()
 	{
 		$config = Config::Instance();
 				
 		// Cache the routes
-		if ($this->cache_routes) {
+		if (self::$cache_routes) {
 			$config->routes = self::$routes;
 			$config->named_routes = self::$named_routes;
 			$config->regenerate();
 		}
 		
 		// Cache the route
-		if (!isset($config->routes[(string)$this->params['Route']]['cached_route'])) {
-			$this->params['cached_route'] = true;
-			$config->routes[(string)$this->params['Route']] = $this->params;
+		if (!isset($config->routes[(string)self::$params['route']]['cached_route'])) {
+			self::$params['cached_route'] = true;
+			$config->routes[(string)self::$params['route']] = self::$params;
 			$config->regenerate();
 		}
 	}
@@ -134,7 +115,7 @@ class Router {
 	 * @return void
 	 *
 	 **/
-	private function map($args,$route)
+	private static function map($args,$route)
 	{	
 		self::$routes[(string)$route] = $args;
 		
@@ -152,7 +133,7 @@ class Router {
 	 * @return string
 	 *
 	 **/	
-	private function process_wildcard($key)
+	private static function process_wildcard($key)
 	{
 		// Search for a predefined wildcard
 		if (!empty(self::$config['wildcards'][$key])) {
@@ -167,58 +148,50 @@ class Router {
 			return '(.+)';
 		}
 	}
-	
+		
 	/**
-	 * Sets an "is_ajax" key in $this->params if the incoming request is an AJAX request
+	 * Adds a few useful extra parameters to self::$params
 	 *
 	 * @return void
 	 *
 	 **/
-	private function is_ajax()
-	{
-		if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) 
-			AND strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
-				$this->params['is_ajax'] = true;
-			}
-	}
-	
-	/**
-	 * Adds a few useful extra parameters to $this->params
-	 *
-	 * @return void
-	 *
-	 **/
-	private function populate_params($params)
+	private static function populate_params($params)
 	{
 		$extra = array(
-			'Controller' => inflector::camelize($this->params['controller']."Controller"),
-			'controller' => inflector::underscore($this->params['controller']),
+			'Controller' => inflector::camelize(self::$params['controller']."Controller"),
+			'controller' => inflector::underscore(self::$params['controller']),
 			
-			'Model' => inflector::classify($this->params['controller']),
-			'model' => inflector::tableize($this->params['controller']),
+			'Model' => inflector::classify(self::$params['controller']),
+			'model' => inflector::tableize(self::$params['controller']),
 
-			'action' => inflector::underscore($this->params['action']),
+			'action' => inflector::underscore(self::$params['action']),
 			
-			'URI' => $this->original,
-			'Route' => $this->string,
+			'URI' => self::$original_uri,
+			'route' => self::$uri,
 		);
 		
-		$this->params = array_merge($params,$extra);
+		// Is it ajax?
+		if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) 
+			AND strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+				self::$params['is_ajax'] = true;
+			}
+		
+		self::$params = array_merge($params,$extra);
 	}
 	
 	/**
-	 * Throws an exception if $this->params does not contain 
+	 * Throws an exception if self::$params does not contain 
 	 * all of the necessary parameters
 	 *
 	 * @return void
 	 * @throws Error
 	 *
 	 **/
-	private function validate_route($params)
+	private static function validate_route($params)
 	{
 		// Did we even find anything?
 		if (empty($params)) {
-			throw new RouterException('no_route_matched',array('uri' => "/".$this->string));
+			throw new RouterException('no_route_matched',array('uri' => "/".self::$uri));
 		}
 		
 		// Validate specific params
@@ -228,13 +201,13 @@ class Router {
 					'missing_parameter',
 					array(
 						'parameter' => $param,
-						'route' => "/".$this->string,
+						'route' => "/".self::$uri,
 					)
 				);	
 			}
 		}
 		
-		// Although the controller prevents private actions from being called,
+		// Although the controller prevents private static actions from being called,
 		// the constructor must be public. The best way to get around this
 		// is to not allow actions starting with underscores to be recognized.
 		if (substr($params['action'],0,1) === '_') {
@@ -256,7 +229,7 @@ class Router {
 	 * @return void
 	 *
 	 **/
-	private function process_uri()
+	private static function process_uri()
 	{
 		// Find the route from the query string
 		// The PATH_INFO method is preferred, since
@@ -280,28 +253,10 @@ class Router {
 		$string = trim(preg_replace('/\.(?=.*\..*$)/s','',$string),'/');
 		
 		// Set the original URI for nostalgic purposes
-		$this->original = $string;
+		self::$original_uri = $string;
 
 		// Set the new URI
-		$this->string = (!empty($string)) ? $string : '';
-	}
-	
-	static function link_to_named($name,$params = array())
-	{
-		if (isset(self::$named_routes[(string)$name])) {
-						
-			$route = self::$named_routes[(string)$name];
-			
-			// Parameters to fill?
-			foreach ($params as $key => $value) {
-				$route = str_replace(':'.$key, $value, $route);
-			}
-			
-			return '/'.trim($route,'/');
-				
-		} else {
-			throw new RouterException('unknown_named_route',array('name' => $name));
-		}
+		self::$uri = (!empty($string)) ? $string : '';
 	}
 	
 	/**
@@ -314,7 +269,7 @@ class Router {
 	 * @return void
 	 *
 	 **/
-	private function process_routes()
+	private static function process_routes()
 	{
 		// Empty Parameters
 		$params = array();
@@ -323,15 +278,15 @@ class Router {
 		$routes =& self::$routes;
 		
 		// URI String
-		$string = $this->string;
+		$string = self::$uri;
 
 		// Direct match?
 		if (isset($routes[(string)$string])) {
 			
-			$this->params = array_merge(self::$config['params'],$routes[(string)$string]);
+			self::$params = array_merge(self::$config['params'],$routes[(string)$string]);
 						
 			// It's a cached route, no need to continue
-			if (isset($this->params['cached_route'])) {
+			if (isset(self::$params['cached_route'])) {
 				return;
 			}
 
@@ -369,7 +324,7 @@ class Router {
 					// a proper regex, and a numerical index for a match
 					if (substr($value,0,1) === ':') {					
 						// Build the string with actual regex patterns
-						$regex = $this->process_wildcard($value);
+						$regex = self::process_wildcard($value);
 
 						if (preg_match('#^'.$regex.'$#',$uri[$key])) {
 							$params[substr($value,1)] = $uri[$key];						
@@ -395,20 +350,17 @@ class Router {
 			
 				// We've found something
 				if (!empty($params)) {
-					$this->params = array_merge(self::$config['params'],array('format' => $format),$uri,$route_params,$params);
+					self::$params = array_merge(self::$config['params'],array('format' => $format),$uri,$route_params,$params);
 					break;
 				}
 			}
 		}
 
 		// Verify Route
-		$this->validate_route($this->params);
-		
-		// Is it an ajax request?
-		$this->is_ajax();
-		
+		self::validate_route(self::$params);
+				
 		// Populate extra parameters
-		$this->populate_params($this->params);
+		self::populate_params(self::$params);
 	}
 }
 
